@@ -3,7 +3,6 @@
 ## Сервисы
 
 [otus-service-user](https://github.com/auwerk/otus-service-user)
-[otus-service-order](https://github.com/auwerk/otus-service-order)
 
 ## Настройка /etc/hosts
 
@@ -49,4 +48,11 @@ helm install keycloak bitnami/keycloak -f ./keycloak/keycloak-values.yaml --name
 
 ```shell
 helm install oauth2-proxy oauth2-proxy/oauth2-proxy -f ./oauth2-proxy/oauth2-proxy-values.yaml --namespace rev-proxy
+```
+
+- Установка PostgreSQL для сервиса user
+
+```shell
+kubectl apply -f ./db/resources/otus-user.yaml
+helm install postgresql -f ./db/values/postgresql-user-values.yaml bitnami/postgresql --namespace otus-user
 ```
