@@ -69,3 +69,9 @@ helm install otus-service-user --namespace otus-user .\helm-charts\otus-service-
 kubectl apply -f ./db/resources/otus-order.yaml
 helm install postgresql -f ./db/values/postgresql-order-values.yaml bitnami/postgresql --namespace otus-order
 ```
+
+- Установка сервиса order
+
+```shell
+helm install otus-service-order --namespace otus-order .\helm-charts\otus-service-order\
+```
