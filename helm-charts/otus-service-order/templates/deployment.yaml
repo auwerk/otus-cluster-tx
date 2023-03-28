@@ -54,6 +54,8 @@ spec:
               value: {{ .Values.keycloak.client.secret }}
             - name: OTUS_ROLE_CUSTOMER
               value: {{ .Values.rbac.roles.customer }}
+            - name: OTUS_PRODUCT_SERVICE_URL
+              value: {{ .Values.services.product.url }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}

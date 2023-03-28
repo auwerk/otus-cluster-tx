@@ -20,6 +20,10 @@ rbac:
   roles:
     customer: customer
 
+services:
+  product:
+    url: http://otus-service-product.otus-product:8080
+
 replicaCount: 1
 
 image:
