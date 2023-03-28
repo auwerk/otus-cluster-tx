@@ -16,6 +16,10 @@ keycloak:
     id: otus-service-user
     secret: tlDTc1VyLLdXcsreWKSUUlmCg67gUcIh
 
+rbac:
+  roles:
+    customer: customer
+
 replicaCount: 1
 
 image:

@@ -3,6 +3,7 @@
 ## Сервисы
 
 [otus-service-user](https://github.com/auwerk/otus-service-user)
+[otus-service-order](https://github.com/auwerk/otus-service-order)
 
 ## Настройка /etc/hosts
 
