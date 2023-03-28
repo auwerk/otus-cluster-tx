@@ -62,3 +62,10 @@ helm install postgresql -f ./db/values/postgresql-user-values.yaml bitnami/postg
 ```shell
 helm install otus-service-user --namespace otus-user .\helm-charts\otus-service-user\
 ```
+
+- Установка PostgreSQL для сервиса order
+
+```shell
+kubectl apply -f ./db/resources/otus-order.yaml
+helm install postgresql -f ./db/values/postgresql-order-values.yaml bitnami/postgresql --namespace otus-order
+```
