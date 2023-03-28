@@ -56,3 +56,9 @@ helm install oauth2-proxy oauth2-proxy/oauth2-proxy -f ./oauth2-proxy/oauth2-pro
 kubectl apply -f ./db/resources/otus-user.yaml
 helm install postgresql -f ./db/values/postgresql-user-values.yaml bitnami/postgresql --namespace otus-user
 ```
+
+- Установка сервиса user
+
+```shell
+helm install otus-service-user --namespace otus-user .\helm-charts\otus-service-user\
+```
