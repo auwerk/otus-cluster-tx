@@ -34,10 +34,6 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            - name: OTUS_KEYCLOAK_URL
-              value: "http://keycloak.security"
-            - name: OTUS_KEYCLOAK_REALM
-              value: "otus"
             - name: OTUS_POSTGRES_HOST
               value: {{ .Values.postgresql.host }}
             - name: OTUS_POSTGRES_PORT
@@ -48,6 +44,10 @@ spec:
               value: {{ .Values.postgresql.user }}
             - name: OTUS_POSTGRES_PASSWORD
               value: {{ .Values.postgresql.password }}
+            - name: OTUS_KEYCLOAK_URL
+              value: {{ .Values.keycloak.url }}
+            - name: OTUS_KEYCLOAK_REALM
+              value: {{ .Values.keycloak.realm }}
             - name: OTUS_KEYCLOAK_CLIENT_ID
               value: {{ .Values.keycloak.client.id }}
             - name: OTUS_KEYCLOAK_CLIENT_SECRET
