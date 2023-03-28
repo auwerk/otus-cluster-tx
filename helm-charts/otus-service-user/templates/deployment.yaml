@@ -39,21 +39,21 @@ spec:
             - name: OTUS_KEYCLOAK_REALM
               value: "otus"
             - name: OTUS_POSTGRES_HOST
-              value: "postgresql.otus-user"
+              value: {{ .Values.postgresql.host }}
             - name: OTUS_POSTGRES_PORT
-              value: "5432"
+              value: "{{ .Values.postgresql.port }}"
             - name: OTUS_POSTGRES_DB
-              value: "otus_user"
+              value: {{ .Values.postgresql.db }}
             - name: OTUS_POSTGRES_USER
-              value: "otus_user"
+              value: {{ .Values.postgresql.user }}
             - name: OTUS_POSTGRES_PASSWORD
-              value: "otus_user"
+              value: {{ .Values.postgresql.password }}
             - name: OTUS_KEYCLOAK_CLIENT_ID
-              value: "otus-service-user"
+              value: {{ .Values.keycloak.client.id }}
             - name: OTUS_KEYCLOAK_CLIENT_SECRET
-              value: "tlDTc1VyLLdXcsreWKSUUlmCg67gUcIh"
+              value: {{ .Values.keycloak.client.secret }}
             - name: OTUS_KEYCLOAK_ADMIN_PASSWORD
-              value: "NIMDA"
+              value: {{ .Values.keycloak.adminPassword }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}

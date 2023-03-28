@@ -2,6 +2,19 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+postgresql:
+  host: postgresql.otus-user
+  port: 5432
+  db: otus_user
+  user: otus_user
+  password: otus_user
+
+keycloak:
+  client:
+    id: otus-service-user
+    secret: tlDTc1VyLLdXcsreWKSUUlmCg67gUcIh
+  adminPassword: NIMDA
+
 replicaCount: 1
 
 image:
