@@ -4,6 +4,7 @@
 
 [otus-service-user](https://github.com/auwerk/otus-service-user)
 [otus-service-order](https://github.com/auwerk/otus-service-order)
+[otus-service-product](https://github.com/auwerk/otus-service-product)
 
 ## Настройка /etc/hosts
 
@@ -75,4 +76,17 @@ helm install postgresql -f ./db/values/postgresql-order-values.yaml bitnami/post
 
 ```shell
 helm install otus-service-order --namespace otus-order .\helm-charts\otus-service-order\
+```
+
+- Установка PostgreSQL для сервиса product
+
+```shell
+kubectl apply -f ./db/resources/otus-product.yaml
+helm install postgresql -f ./db/values/postgresql-product-values.yaml bitnami/postgresql --namespace otus-product
+```
+
+- Установка сервиса product
+
+```shell
+helm install otus-service-product --namespace otus-product .\helm-charts\otus-service-product\
 ```
