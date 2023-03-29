@@ -17,6 +17,10 @@ keycloak:
     secret: tlDTc1VyLLdXcsreWKSUUlmCg67gUcIh
   adminPassword: NIMDA
 
+services:
+  billing:
+    url: http://otus-service-billing.otus-billing:8080
+
 replicaCount: 1
 
 image:

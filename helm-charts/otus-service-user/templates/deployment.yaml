@@ -54,6 +54,8 @@ spec:
               value: {{ .Values.keycloak.client.secret }}
             - name: OTUS_KEYCLOAK_ADMIN_PASSWORD
               value: {{ .Values.keycloak.adminPassword }}
+            - name: OTUS_BILLING_SERVICE_URL
+              value: {{ .Values.services.billing.url }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
