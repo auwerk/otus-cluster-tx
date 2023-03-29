@@ -2,10 +2,10 @@
 
 ## Сервисы
 
-[otus-service-user](https://github.com/auwerk/otus-service-user)
-[otus-service-order](https://github.com/auwerk/otus-service-order)
-[otus-service-product](https://github.com/auwerk/otus-service-product)
-[otus-service-billing](https://github.com/auwerk/otus-service-billing)
+- [otus-service-user](https://github.com/auwerk/otus-service-user)
+- [otus-service-order](https://github.com/auwerk/otus-service-order)
+- [otus-service-product](https://github.com/auwerk/otus-service-product)
+- [otus-service-billing](https://github.com/auwerk/otus-service-billing)
 
 ## Настройка /etc/hosts
 
