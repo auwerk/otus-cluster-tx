@@ -1,0 +1,496 @@
+{
+	"info": {
+		"_postman_id": "40e02597-267b-460e-b977-e974b7920122",
+		"name": "Otus TX",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Sign up customer",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var rnd = Math.floor((Math.random() * 10000) + 1);\r",
+							"pm.collectionVariables.set(\"customer_username\", \"customer\" + rnd);\r",
+							"pm.collectionVariables.set(\"customer_password\",  \"customer-pass-\" + rnd);\r",
+							"pm.collectionVariables.set(\"customer_email\", \"customer\" + rnd + \"@mail.com\");\r",
+							"pm.collectionVariables.set(\"customer_firstName\", \"Customer\" + rnd);\r",
+							"pm.collectionVariables.set(\"customer_lastName\",  \"Customer\" + rnd + \"sky\");\r",
+							"pm.collectionVariables.set(\"customer_phoneNumber\",  rnd);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userName\": \"{{customer_username}}\",\r\n    \"email\": \"{{customer_email}}\",\r\n    \"firstName\": \"{{customer_firstName}}\",\r\n    \"lastName\": \"{{customer_lastName}}\",\r\n    \"birthDate\": \"1986-03-20\",\r\n    \"phoneNumber\": {{customer_phoneNumber}},\r\n    \"password\": \"{{customer_password}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/api/user/signup",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"user",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Sign in with customer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var jsonResponse = JSON.parse(responseBody);\r",
+							"pm.collectionVariables.set(\"customer_token\", jsonResponse.access_token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "otus-service-user",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "tlDTc1VyLLdXcsreWKSUUlmCg67gUcIh",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "{{customer_username}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{customer_password}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://keycloak.{{baseUrl}}/realms/otus/protocol/openid-connect/token",
+					"protocol": "http",
+					"host": [
+						"keycloak",
+						"{{baseUrl}}"
+					],
+					"path": [
+						"realms",
+						"otus",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Credit some funds",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response is valid\", function() {\r",
+							"    var Ajv = require('ajv');\r",
+							"    var ajv = new Ajv();\r",
+							"    var schema = {\"type\": \"object\", \"required\": [\"operationId\"]};\r",
+							"\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var jsonIsValid = ajv.validate(schema, jsonData);\r",
+							"    if (!jsonIsValid) {\r",
+							"        console.log(\"JSON validation error: \" + JSON.stringify(ajv.errors));\r",
+							"    }\r",
+							"    pm.expect(jsonIsValid).to.be.true;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"initial_credit_amount\", 1000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{customer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"type\": \"CREDIT\",\r\n    \"amount\": {{initial_credit_amount}},\r\n    \"comment\": \"Credit some funds\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/api/billing/operation",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"billing",
+						"operation"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check account balance",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response is valid\", function() {\r",
+							"    var Ajv = require('ajv');\r",
+							"    var ajv = new Ajv();\r",
+							"    var schema = {\"type\": \"object\", \"required\": [\"balance\", \"operations\"]};\r",
+							"\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var jsonIsValid = ajv.validate(schema, jsonData);\r",
+							"    if (!jsonIsValid) {\r",
+							"        console.log(\"JSON validation error: \" + JSON.stringify(ajv.errors));\r",
+							"    }\r",
+							"    pm.expect(jsonIsValid).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Balance is OK\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.balance).to.eql(pm.collectionVariables.get(\"initial_credit_amount\"));\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{customer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/billing/account",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"billing",
+						"account"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create order",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response is valid\", function() {\r",
+							"    var Ajv = require('ajv');\r",
+							"    var ajv = new Ajv();\r",
+							"    var schema = {\"type\": \"object\", \"required\": [\"orderId\"]};\r",
+							"\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var jsonIsValid = ajv.validate(schema, jsonData);\r",
+							"    if (!jsonIsValid) {\r",
+							"        console.log(\"JSON validation error: \" + JSON.stringify(ajv.errors));\r",
+							"    }\r",
+							"    pm.expect(jsonIsValid).to.be.true;\r",
+							"});\r",
+							"\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set(\"order_id\", jsonData.orderId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{customer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/order",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"order"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add order position #1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response is valid\", function() {\r",
+							"    var Ajv = require('ajv');\r",
+							"    var ajv = new Ajv();\r",
+							"    var schema = {\"type\": \"object\", \"required\": [\"positionId\"]};\r",
+							"\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var jsonIsValid = ajv.validate(schema, jsonData);\r",
+							"    if (!jsonIsValid) {\r",
+							"        console.log(\"JSON validation error: \" + JSON.stringify(ajv.errors));\r",
+							"    }\r",
+							"    pm.expect(jsonIsValid).to.be.true;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{customer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"orderId\": \"{{order_id}}\",\r\n    \"productCode\": \"EDITOR\",\r\n    \"quantity\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/api/order/position",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"order",
+						"position"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add order position #2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response is valid\", function() {\r",
+							"    var Ajv = require('ajv');\r",
+							"    var ajv = new Ajv();\r",
+							"    var schema = {\"type\": \"object\", \"required\": [\"positionId\"]};\r",
+							"\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var jsonIsValid = ajv.validate(schema, jsonData);\r",
+							"    if (!jsonIsValid) {\r",
+							"        console.log(\"JSON validation error: \" + JSON.stringify(ajv.errors));\r",
+							"    }\r",
+							"    pm.expect(jsonIsValid).to.be.true;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{customer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"orderId\": \"{{order_id}}\",\r\n    \"productCode\": \"PLAYER\",\r\n    \"quantity\": 2\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/api/order/position",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"order",
+						"position"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "customer_username",
+			"value": ""
+		},
+		{
+			"key": "customer_password",
+			"value": ""
+		},
+		{
+			"key": "customer_email",
+			"value": ""
+		},
+		{
+			"key": "customer_firstName",
+			"value": ""
+		},
+		{
+			"key": "customer_lastName",
+			"value": ""
+		},
+		{
+			"key": "customer_phoneNumber",
+			"value": ""
+		},
+		{
+			"key": "customer_token",
+			"value": ""
+		},
+		{
+			"key": "initial_credit_amount",
+			"value": ""
+		},
+		{
+			"key": "order_id",
+			"value": ""
+		}
+	]
+}
