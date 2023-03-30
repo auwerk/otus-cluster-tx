@@ -1,0 +1,385 @@
+{
+	"info": {
+		"_postman_id": "c5e8ccb3-4ddc-48f0-acca-28db4b942224",
+		"name": "Otus Idempotent Cancel",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Sign up customer",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var rnd = Math.floor((Math.random() * 10000) + 1);\r",
+							"pm.collectionVariables.set(\"customer_username\", \"customer\" + rnd);\r",
+							"pm.collectionVariables.set(\"customer_password\",  \"customer-pass-\" + rnd);\r",
+							"pm.collectionVariables.set(\"customer_email\", \"customer\" + rnd + \"@mail.com\");\r",
+							"pm.collectionVariables.set(\"customer_firstName\", \"Customer\" + rnd);\r",
+							"pm.collectionVariables.set(\"customer_lastName\",  \"Customer\" + rnd + \"sky\");\r",
+							"pm.collectionVariables.set(\"customer_phoneNumber\",  rnd);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userName\": \"{{customer_username}}\",\r\n    \"email\": \"{{customer_email}}\",\r\n    \"firstName\": \"{{customer_firstName}}\",\r\n    \"lastName\": \"{{customer_lastName}}\",\r\n    \"birthDate\": \"1986-03-20\",\r\n    \"phoneNumber\": {{customer_phoneNumber}},\r\n    \"password\": \"{{customer_password}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/api/user/signup",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"user",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Sign in with customer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var jsonResponse = JSON.parse(responseBody);\r",
+							"pm.collectionVariables.set(\"customer_token\", jsonResponse.access_token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "otus-service-user",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "tlDTc1VyLLdXcsreWKSUUlmCg67gUcIh",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "{{customer_username}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{customer_password}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://keycloak.{{baseUrl}}/realms/otus/protocol/openid-connect/token",
+					"protocol": "http",
+					"host": [
+						"keycloak",
+						"{{baseUrl}}"
+					],
+					"path": [
+						"realms",
+						"otus",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Make CREDIT operation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response is valid\", function() {\r",
+							"    var Ajv = require('ajv');\r",
+							"    var ajv = new Ajv();\r",
+							"    var schema = {\"type\": \"object\", \"required\": [\"operationId\"]};\r",
+							"\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var jsonIsValid = ajv.validate(schema, jsonData);\r",
+							"    if (!jsonIsValid) {\r",
+							"        console.log(\"JSON validation error: \" + JSON.stringify(ajv.errors));\r",
+							"    }\r",
+							"    pm.expect(jsonIsValid).to.be.true;\r",
+							"});\r",
+							"\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set(\"credit_operation_id\", jsonData.operationId);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"credit_amount\", 1000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{customer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"type\": \"CREDIT\",\r\n    \"amount\": {{credit_amount}},\r\n    \"comment\": \"Credit some funds\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/api/billing/operation",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"billing",
+						"operation"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cancel CREDIT operation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{customer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"comment\": \"Canceling test CREDIT operation\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/api/billing/operation/{{credit_operation_id}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"billing",
+						"operation",
+						"{{credit_operation_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cancel CREDIT operation again",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 409\", function () {\r",
+							"    pm.response.to.have.status(409);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{customer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"comment\": \"Canceling test CREDIT operation\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/api/billing/operation/{{credit_operation_id}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"billing",
+						"operation",
+						"{{credit_operation_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check account balance",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response is valid\", function() {\r",
+							"    var Ajv = require('ajv');\r",
+							"    var ajv = new Ajv();\r",
+							"    var schema = {\"type\": \"object\", \"required\": [\"balance\"]};\r",
+							"\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var jsonIsValid = ajv.validate(schema, jsonData);\r",
+							"    if (!jsonIsValid) {\r",
+							"        console.log(\"JSON validation error: \" + JSON.stringify(ajv.errors));\r",
+							"    }\r",
+							"    pm.expect(jsonIsValid).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Balance is OK\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.balance).to.eql(0);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{customer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/billing/account",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"billing",
+						"account"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
