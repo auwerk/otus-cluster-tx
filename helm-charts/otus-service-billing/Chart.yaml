@@ -3,5 +3,5 @@ name: otus-service-billing
 description: Billing microservice
 
 type: application
-version: 1.0.3
-appVersion: "1.1.1"
+version: 1.0.5
+appVersion: "1.1.3"
