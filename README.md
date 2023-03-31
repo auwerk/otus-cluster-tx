@@ -6,6 +6,11 @@
 - [otus-service-order](https://github.com/auwerk/otus-service-order)
 - [otus-service-product](https://github.com/auwerk/otus-service-product)
 - [otus-service-billing](https://github.com/auwerk/otus-service-billing)
+- [otus-service-license](https://github.com/auwerk/otus-service-license)
+
+## Реализация паттерна Saga
+
+- [reactive-saga](https://github.com/auwerk/reactive-saga)
 
 ## Настройка /etc/hosts
 
