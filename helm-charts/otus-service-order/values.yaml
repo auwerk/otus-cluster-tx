@@ -25,6 +25,8 @@ services:
     url: http://otus-service-product.otus-product:8080
   license:
     url: http://otus-service-license.otus-license:8080
+  billing:
+    url: http://otus-service-billing.otus-billing:8080
 
 replicaCount: 1
 

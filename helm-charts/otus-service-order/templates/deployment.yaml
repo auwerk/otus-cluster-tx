@@ -58,6 +58,8 @@ spec:
               value: {{ .Values.services.product.url }}
             - name: OTUS_LICENSE_SERVICE_URL
               value: {{ .Values.services.license.url }}
+            - name: OTUS_BILLING_SERVICE_URL
+              value: {{ .Values.services.billing.url }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}

@@ -3,5 +3,5 @@ name: otus-service-order
 description: Order management microservice
 
 type: application
-version: 1.0.9
-appVersion: "1.6.0"
+version: 1.0.10
+appVersion: "1.6.1"
