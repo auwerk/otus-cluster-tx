@@ -489,7 +489,7 @@
 				"method": "PUT",
 				"header": [],
 				"url": {
-					"raw": "http://{{baseUrl}}/api/order/{{order_id}}",
+					"raw": "http://{{baseUrl}}/api/order/{{order_id}}/place",
 					"protocol": "http",
 					"host": [
 						"{{baseUrl}}"
@@ -497,7 +497,8 @@
 					"path": [
 						"api",
 						"order",
-						"{{order_id}}"
+						"{{order_id}}",
+						"place"
 					]
 				}
 			},
@@ -530,6 +531,111 @@
 							"pm.test(\"Order status is PLACED\", function() {\r",
 							"    var jsonData = pm.response.json();\r",
 							"    pm.expect(jsonData.status).to.be.eql(\"PLACED\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{customer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/order/{{order_id}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"order",
+						"{{order_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pay order",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{customer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/order/{{order_id}}/pay",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"order",
+						"{{order_id}}",
+						"pay"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check order payment",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response is valid\", function() {\r",
+							"    var Ajv = require('ajv');\r",
+							"    var ajv = new Ajv();\r",
+							"    var schema = {\"type\": \"object\", \"required\": [\"status\"]};\r",
+							"\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var jsonIsValid = ajv.validate(schema, jsonData);\r",
+							"    if (!jsonIsValid) {\r",
+							"        console.log(\"JSON validation error: \" + JSON.stringify(ajv.errors));\r",
+							"    }\r",
+							"    pm.expect(jsonIsValid).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Order status is COMPLETED\", function() {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.status).to.be.eql(\"COMPLETED\");\r",
 							"});"
 						],
 						"type": "text/javascript"
