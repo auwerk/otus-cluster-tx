@@ -273,7 +273,7 @@
 			"response": []
 		},
 		{
-			"name": "Create order",
+			"name": "Create order #1",
 			"event": [
 				{
 					"listen": "test",
@@ -331,7 +331,7 @@
 			"response": []
 		},
 		{
-			"name": "Add order position #1",
+			"name": "Add order position #1.1",
 			"event": [
 				{
 					"listen": "test",
@@ -396,7 +396,7 @@
 			"response": []
 		},
 		{
-			"name": "Add order position #2",
+			"name": "Add order position #1.2",
 			"event": [
 				{
 					"listen": "test",
@@ -438,7 +438,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"orderId\": \"{{order_id}}\",\r\n    \"productCode\": \"PLAYER\",\r\n    \"quantity\": 2\r\n}",
+					"raw": "{\r\n    \"orderId\": \"{{order_id}}\",\r\n    \"productCode\": \"PLAYER\",\r\n    \"quantity\": 1\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -461,7 +461,7 @@
 			"response": []
 		},
 		{
-			"name": "Place order",
+			"name": "Place order #1",
 			"event": [
 				{
 					"listen": "test",
@@ -505,7 +505,7 @@
 			"response": []
 		},
 		{
-			"name": "Check order is placed",
+			"name": "Check order #1 is placed",
 			"event": [
 				{
 					"listen": "test",
@@ -566,7 +566,7 @@
 			"response": []
 		},
 		{
-			"name": "Pay order",
+			"name": "Pay order #1",
 			"event": [
 				{
 					"listen": "test",
@@ -610,7 +610,7 @@
 			"response": []
 		},
 		{
-			"name": "Check order payment",
+			"name": "Check order #1 is COMPLETED",
 			"event": [
 				{
 					"listen": "test",
@@ -665,6 +665,595 @@
 						"api",
 						"order",
 						"{{order_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check remaining account balance",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response is valid\", function() {\r",
+							"    var Ajv = require('ajv');\r",
+							"    var ajv = new Ajv();\r",
+							"    var schema = {\"type\": \"object\", \"required\": [\"balance\", \"operations\"]};\r",
+							"\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var jsonIsValid = ajv.validate(schema, jsonData);\r",
+							"    if (!jsonIsValid) {\r",
+							"        console.log(\"JSON validation error: \" + JSON.stringify(ajv.errors));\r",
+							"    }\r",
+							"    pm.expect(jsonIsValid).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Balance is OK\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.balance).to.eql(399.25);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{customer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/billing/account",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"billing",
+						"account"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check acquired licenses",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response is valid\", function() {\r",
+							"    var Ajv = require('ajv');\r",
+							"    var ajv = new Ajv();\r",
+							"\r",
+							"    var schema = {\r",
+							"        \"type\": \"array\",\r",
+							"        \"items\": {\r",
+							"            \"type\": \"object\",\r",
+							"            \"required\": [\"id\", \"queryId\", \"productCode\", \"createdAt\"]\r",
+							"        }\r",
+							"    };\r",
+							"\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var jsonIsValid = ajv.validate(schema, jsonData);\r",
+							"    if (!jsonIsValid) {\r",
+							"        console.log(\"JSON validation error: \" + JSON.stringify(ajv.errors));\r",
+							"    }\r",
+							"    pm.expect(jsonIsValid).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Has all ordered licenses\", function() {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.length).to.be.eql(2);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{customer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/license",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"license"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create order #2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response is valid\", function() {\r",
+							"    var Ajv = require('ajv');\r",
+							"    var ajv = new Ajv();\r",
+							"    var schema = {\"type\": \"object\", \"required\": [\"orderId\"]};\r",
+							"\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var jsonIsValid = ajv.validate(schema, jsonData);\r",
+							"    if (!jsonIsValid) {\r",
+							"        console.log(\"JSON validation error: \" + JSON.stringify(ajv.errors));\r",
+							"    }\r",
+							"    pm.expect(jsonIsValid).to.be.true;\r",
+							"});\r",
+							"\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set(\"order2_id\", jsonData.orderId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{customer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/order",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"order"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add order position #2.1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response is valid\", function() {\r",
+							"    var Ajv = require('ajv');\r",
+							"    var ajv = new Ajv();\r",
+							"    var schema = {\"type\": \"object\", \"required\": [\"positionId\"]};\r",
+							"\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var jsonIsValid = ajv.validate(schema, jsonData);\r",
+							"    if (!jsonIsValid) {\r",
+							"        console.log(\"JSON validation error: \" + JSON.stringify(ajv.errors));\r",
+							"    }\r",
+							"    pm.expect(jsonIsValid).to.be.true;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{customer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"orderId\": \"{{order2_id}}\",\r\n    \"productCode\": \"PHOTO\",\r\n    \"quantity\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/api/order/position",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"order",
+						"position"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Place order #2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{customer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/order/{{order2_id}}/place",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"order",
+						"{{order2_id}}",
+						"place"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check order #2 is placed",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response is valid\", function() {\r",
+							"    var Ajv = require('ajv');\r",
+							"    var ajv = new Ajv();\r",
+							"    var schema = {\"type\": \"object\", \"required\": [\"status\"]};\r",
+							"\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var jsonIsValid = ajv.validate(schema, jsonData);\r",
+							"    if (!jsonIsValid) {\r",
+							"        console.log(\"JSON validation error: \" + JSON.stringify(ajv.errors));\r",
+							"    }\r",
+							"    pm.expect(jsonIsValid).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Order status is PLACED\", function() {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.status).to.be.eql(\"PLACED\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{customer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/order/{{order2_id}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"order",
+						"{{order2_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pay order #2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403\", function () {\r",
+							"    pm.response.to.have.status(403);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{customer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/order/{{order2_id}}/pay",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"order",
+						"{{order2_id}}",
+						"pay"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check order #2 is PLACED",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response is valid\", function() {\r",
+							"    var Ajv = require('ajv');\r",
+							"    var ajv = new Ajv();\r",
+							"    var schema = {\"type\": \"object\", \"required\": [\"status\"]};\r",
+							"\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var jsonIsValid = ajv.validate(schema, jsonData);\r",
+							"    if (!jsonIsValid) {\r",
+							"        console.log(\"JSON validation error: \" + JSON.stringify(ajv.errors));\r",
+							"    }\r",
+							"    pm.expect(jsonIsValid).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Order status is COMPLETED\", function() {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.status).to.be.eql(\"PLACED\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{customer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/order/{{order2_id}}",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"order",
+						"{{order2_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check account balance has not changed",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response is valid\", function() {\r",
+							"    var Ajv = require('ajv');\r",
+							"    var ajv = new Ajv();\r",
+							"    var schema = {\"type\": \"object\", \"required\": [\"balance\", \"operations\"]};\r",
+							"\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var jsonIsValid = ajv.validate(schema, jsonData);\r",
+							"    if (!jsonIsValid) {\r",
+							"        console.log(\"JSON validation error: \" + JSON.stringify(ajv.errors));\r",
+							"    }\r",
+							"    pm.expect(jsonIsValid).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Balance is OK\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.balance).to.eql(399.25);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{customer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/billing/account",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"billing",
+						"account"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check no new licenses acquired",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response is valid\", function() {\r",
+							"    var Ajv = require('ajv');\r",
+							"    var ajv = new Ajv();\r",
+							"\r",
+							"    var schema = {\r",
+							"        \"type\": \"array\",\r",
+							"        \"items\": {\r",
+							"            \"type\": \"object\",\r",
+							"            \"required\": [\"id\", \"queryId\", \"productCode\", \"createdAt\"]\r",
+							"        }\r",
+							"    };\r",
+							"\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var jsonIsValid = ajv.validate(schema, jsonData);\r",
+							"    if (!jsonIsValid) {\r",
+							"        console.log(\"JSON validation error: \" + JSON.stringify(ajv.errors));\r",
+							"    }\r",
+							"    pm.expect(jsonIsValid).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Has all ordered licenses\", function() {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.length).to.be.eql(2);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{customer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/license",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"license"
 					]
 				}
 			},
