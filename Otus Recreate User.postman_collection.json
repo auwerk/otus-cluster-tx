@@ -1,0 +1,329 @@
+{
+	"info": {
+		"_postman_id": "897a50fc-ad07-4add-8106-7f20ef1ff017",
+		"name": "Otus Recreate User",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Sign up customer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userName\": \"recreate_test_customer\",\r\n    \"email\": \"customer@recreate.com\",\r\n    \"firstName\": \"Recreate\",\r\n    \"lastName\": \"Customer\",\r\n    \"birthDate\": \"1986-03-20\",\r\n    \"phoneNumber\": 999111,\r\n    \"password\": \"recreate_test_customer-pass\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/api/user/signup",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"user",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Sign in with customer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var jsonResponse = JSON.parse(responseBody);\r",
+							"pm.collectionVariables.set(\"recreate_customer_token\", jsonResponse.access_token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "otus-service-user",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "tlDTc1VyLLdXcsreWKSUUlmCg67gUcIh",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "recreate_test_customer",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "recreate_test_customer-pass",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://keycloak.{{baseUrl}}/realms/otus/protocol/openid-connect/token",
+					"protocol": "http",
+					"host": [
+						"keycloak",
+						"{{baseUrl}}"
+					],
+					"path": [
+						"realms",
+						"otus",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete customer account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{recreate_customer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/user/profile",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"user",
+						"profile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Sign up customer again",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userName\": \"recreate_test_customer\",\r\n    \"email\": \"customer@recreate.com\",\r\n    \"firstName\": \"Recreate\",\r\n    \"lastName\": \"Customer\",\r\n    \"birthDate\": \"1986-03-20\",\r\n    \"phoneNumber\": 999111,\r\n    \"password\": \"recreate_test_customer-pass\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}/api/user/signup",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"user",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Sign in with customer again",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var jsonResponse = JSON.parse(responseBody);\r",
+							"pm.collectionVariables.set(\"recreate_customer_token\", jsonResponse.access_token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "otus-service-user",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "tlDTc1VyLLdXcsreWKSUUlmCg67gUcIh",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "recreate_test_customer",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "recreate_test_customer-pass",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://keycloak.{{baseUrl}}/realms/otus/protocol/openid-connect/token",
+					"protocol": "http",
+					"host": [
+						"keycloak",
+						"{{baseUrl}}"
+					],
+					"path": [
+						"realms",
+						"otus",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete customer account again",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{recreate_customer_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}/api/user/profile",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"user",
+						"profile"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
