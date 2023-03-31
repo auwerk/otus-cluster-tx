@@ -1,0 +1,10 @@
+auth:
+  enablePostgresUser: true
+  postgresPassword: "StrongPassword"
+  username: "otus_license"
+  password: "otus_license"
+  database: "otus_license"
+primary:
+  persistence:
+    enabled: true
+    existingClaim: postgresql-data

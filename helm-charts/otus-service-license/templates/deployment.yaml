@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "otus-service-license.fullname" . }}
+  labels:
+    {{- include "otus-service-license.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "otus-service-license.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "otus-service-license.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "otus-service-license.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: OTUS_POSTGRES_HOST
+              value: {{ .Values.postgresql.host }}
+            - name: OTUS_POSTGRES_PORT
+              value: "{{ .Values.postgresql.port }}"
+            - name: OTUS_POSTGRES_DB
+              value: {{ .Values.postgresql.db }}
+            - name: OTUS_POSTGRES_USER
+              value: {{ .Values.postgresql.user }}
+            - name: OTUS_POSTGRES_PASSWORD
+              value: {{ .Values.postgresql.password }}
+            - name: OTUS_KEYCLOAK_URL
+              value: {{ .Values.keycloak.url }}
+            - name: OTUS_KEYCLOAK_REALM
+              value: {{ .Values.keycloak.realm }}
+            - name: OTUS_KEYCLOAK_CLIENT_ID
+              value: {{ .Values.keycloak.client.id }}
+            - name: OTUS_KEYCLOAK_CLIENT_SECRET
+              value: {{ .Values.keycloak.client.secret }}
+            - name: OTUS_ROLE_CUSTOMER
+              value: {{ .Values.rbac.roles.customer }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /q/health/live
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /q/health/ready
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      initContainers:
+        - name: "{{ .Chart.Name }}-db"
+          image: "{{ .Values.image.repository }}-db:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          command: [ 'sh', '-c', 'liquibase --defaultsFile=/liquibase/changelog/liquibase.properties update' ]
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
