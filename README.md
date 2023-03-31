@@ -104,3 +104,16 @@ helm install postgresql -f ./db/values/postgresql-billing-values.yaml bitnami/po
 ```shell
 helm install otus-service-billing --namespace otus-billing .\helm-charts\otus-service-billing\
 ```
+
+- Установка PostgreSQL для сервиса license
+
+```shell
+kubectl apply -f ./db/resources/otus-license.yaml
+helm install postgresql -f ./db/values/postgresql-license-values.yaml bitnami/postgresql --namespace otus-license
+```
+
+- Установка сервиса license
+
+```shell
+helm install otus-service-license --namespace otus-license .\helm-charts\otus-service-license\
+```
